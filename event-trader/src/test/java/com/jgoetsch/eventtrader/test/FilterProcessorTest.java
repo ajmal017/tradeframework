@@ -1,12 +1,13 @@
 package com.jgoetsch.eventtrader.test;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.junit.Test;
 
 import com.jgoetsch.eventtrader.Msg;
 import com.jgoetsch.eventtrader.TradeSignal;
@@ -21,10 +22,9 @@ import com.jgoetsch.eventtrader.filter.TimeOfDayFilter;
 import com.jgoetsch.eventtrader.filter.UsernameFilter;
 import com.jgoetsch.tradeframework.Contract;
 
-import junit.framework.TestCase;
+public class FilterProcessorTest {
 
-public class FilterProcessorTest extends TestCase {
-
+	@Test
 	public void testFilterChain() throws Exception {
 		List<FilterProcessor<TradeSignal>> filters = new ArrayList<FilterProcessor<TradeSignal>>();
 		
@@ -58,14 +58,15 @@ public class FilterProcessorTest extends TestCase {
 		AssertFilter.shouldNotProcess(filterChain, new TradeSignal(TradeType.BUY, "DGLY", new Msg("timothysykes", "Buying banned stock")));
 	}
 
-	private static final DateTimeZone tz = DateTimeZone.forID("America/New_York");
+	private static final ZoneId tz = ZoneId.of("America/New_York");
 
+	@Test
 	public void testTimeOfDayFilter() throws Exception {
 		TimeOfDayFilter<Msg> afternoonFilter = new TimeOfDayFilter<Msg>();
 		afternoonFilter.setAfter("13:00");
-		Msg morningAlert = new Msg(new DateTime(2017, 10, 11, 9, 47, 0, 0, tz), "Test", "Morning alert");
-		Msg middayAlert = new Msg(new DateTime(2017, 10, 11, 12, 05, 0, 0, tz), "Test", "Midday alert");
-		Msg afternoonAlert = new Msg(new DateTime(2017, 10, 11, 15, 25, 0, 0, tz), "Test", "Afternoon alert");
+		Msg morningAlert = new Msg(ZonedDateTime.of(2017, 10, 11, 9, 47, 0, 0, tz).toInstant(), "Test", "Morning alert");
+		Msg middayAlert = new Msg(ZonedDateTime.of(2017, 10, 11, 12, 05, 0, 0, tz).toInstant(), "Test", "Midday alert");
+		Msg afternoonAlert = new Msg(ZonedDateTime.of(2017, 10, 11, 15, 25, 0, 0, tz).toInstant(), "Test", "Afternoon alert");
 		AssertFilter.shouldNotProcess(afternoonFilter, morningAlert);
 		AssertFilter.shouldNotProcess(afternoonFilter, middayAlert);
 		AssertFilter.shouldProcess(afternoonFilter, afternoonAlert);
@@ -89,6 +90,7 @@ public class FilterProcessorTest extends TestCase {
 		AssertFilter.shouldNotProcess(middayFilter, afternoonAlert);
 	}
 
+	@Test
 	public void testPriceFilter() throws Exception {
 		PriceFilter priceFilter = new PriceFilter();
 		priceFilter.setMin(2.0);

@@ -1,0 +1,29 @@
+
+allprojects {
+    group = 'com.jgoetsch.tradeframework'
+    version = '0.9.3-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java-library'
+	apply plugin: "groovy"
+    apply plugin: 'maven-publish'
+
+    repositories {
+        mavenCentral()
+    }
+
+    sourceCompatibility = '1.8'
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from(components.java)
+            }
+        }
+    }
+
+	test {
+		useJUnitPlatform()
+	}
+}
